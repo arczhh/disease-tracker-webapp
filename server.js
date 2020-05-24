@@ -236,7 +236,7 @@ function addPatStat(name,req,res){
       firebase.firestore().collection("patientStatus").doc(`${snapshot.size}`).set({
         statusName: name,
       });
-      alert("success","เพิ่มสถานะผู้ป่วยสำเร็จ","/patStat"+id,req,res)
+      alert("success","เพิ่มสถานะผู้ป่วยสำเร็จ","/patStat",req,res)
     })
   }
 }
