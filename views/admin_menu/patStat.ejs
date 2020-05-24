@@ -1,0 +1,138 @@
+<%- include('../includes/header.ejs') %> 
+<%- include('../includes/sidebar.ejs') %> 
+<title>การจัดการสถานะของผู้ป่วย</title>
+<div class="container-fluid">
+    <h1 class="mt-4">การจัดสถานะของผู้ป่วย</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลที่เกี่ยวข้อง</li>
+        <li class="breadcrumb-item active">สถานะของผู้ป่วย</li>
+    </ol>
+    <% if(alert=="saved") { %>
+        <div class="alert alert-success" role="alert">เพิ่มสถานะใหม่สำเร็จ</div>
+    <% }else if(alert=="edited") {%>
+        <div class="alert alert-success" role="alert">บันทึกการเปลี่ยนแปลงสำเร็จ</div>
+    <% } %>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="form-inline" method="POST" action="/patStat">
+                <div class="form-group mb-2">
+                  กรุณากรอกสถานะ:
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                  <input type="text" class="form-control" name="statName" id="statName" placeholder="เช่น กำลังรักษา">
+                </div>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" style="margin-top: -8px;" data-toggle="modal" data-target="#exampleModal" onclick="displayResult()">
+                    เพิ่ม
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">คุณต้องการเพิ่มสถานะใหม่นี้ใช่หรือไม่</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <label id="myHeader"></label>
+                            <label id="alert" style="color: red;"></label>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="addCancel" data-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary mb-2" id="addSubmit">ยืนยัน</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+              </form>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header"><i class="fas fa-table mr-1"></i>ตารางข้อมูลของโรค</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>สถานะ</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>ชื่อของโรค</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <% patStat.forEach(function(e) { %>
+                            <tr>
+                              <th scope="row"><%= Number(e.id)+1 %> </th>
+                              <td><%= e.data()['statusName'] %></td>
+                              <td>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= Number(e.id)+1 %>" id="editID<%= Number(e.id)+1 %>">
+                                    แก้ไข
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="edit<%= Number(e.id)+1 %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= Number(e.id)+1 %>Label" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="edit<%= Number(e.id)+1 %>Label">คุณต้องการเพิ่มโรคชนิดใหม่นี้ใช่หรือไม่</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form-inline" method="POST" action="/editPatStat">
+                                                <div class="form-group mb-2">
+                                                    หมายเลขไอดี:&nbsp<input type="text" class="form-control" name="patStatID" id="patStatID" value="<%= e.id %>" readonly>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    ชื่อของโรค ณ ปัจจุบัน:&nbsp<input type="text" class="form-control" name="patStatName" id="patStatName" value="<%= e.data()['statusName'] %>" readonly>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                  กรุณากรอกชื่อของโรค:
+                                                </div>
+                                                <div class="form-group mx-sm-3 mb-2">
+                                                  <label for="inputDiseaseNameEdit" class="sr-only">Disease Name</label>
+                                                  <input type="text" class="form-control" name="patStatNameNew" id="patStatNameNew" placeholder="<%= e.data()['statusName'] %>" value="<%= e.diseaseName %>">
+                                                </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="editCancel">ยกเลิก</button>
+                                        <button type="submit" class="btn btn-primary mb-2" id="editSubmit">ยืนยัน</button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                    </div>
+                                </div>
+                              </td>
+                            </tr>
+                          <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+    function displayResult() {
+        if(document.getElementById("statName").value != ""){
+            document.getElementById("alert").innerHTML = "";
+            document.getElementById("myHeader").innerHTML = "สถานะที่คุณต้องการเพิ่ม คือ<b>&nbsp"+document.getElementById("statName").value+"</b>";
+            document.getElementById('addSubmit').style.visibility = 'visible';
+        }else{
+            document.getElementById("myHeader").innerHTML = "";
+            document.getElementById("alert").innerHTML = "<b>กรุณากรอกสถานะที่ต้องการเพิ่ม</b>";
+            document.getElementById('addSubmit').style.visibility = 'hidden';
+        }
+    }
+</script>

@@ -1,0 +1,35 @@
+{
+  "name": "disease-tracker",
+  "version": "1.0.0",
+  "engines": { 
+    "node": "8.9.4" 
+ },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "nodemon": "nodemon server.js",
+    "pm2": "pm2 start server.js",
+    "pm2del": "pm2 del server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "body-parser-csv": "^1.0.0",
+    "cookie-parser": "^1.4.5",
+    "ejs": "^3.1.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "firebase-admin": "^8.12.1",
+    "firebase-functions": "^3.6.1",
+    "formidable": "^1.2.2",
+    "fs-extra": "^9.0.0",
+    "moment": "^2.25.3",
+    "neat-csv": "^5.2.0",
+    "nodemon": "^2.0.3",
+    "pm2": "^4.4.0"
+  }
+}

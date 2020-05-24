@@ -1,0 +1,437 @@
+<title>การจัดการตำแหน่งผู้ป่วย</title>
+<%- include('../includes/header.ejs') %> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- Google Maps JavaScript Library -->
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyBrItP1Jb1JCixbxxwYnqMmtQU198J_72g"></script>
+<%- include('../includes/sidebar.ejs') %> 
+<div class="container-fluid">
+  <h1 class="mt-4">การจัดการตำแหน่งผู้ป่วย</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+    <li class="breadcrumb-item ">จัดการข้อมูลผู้ป่วย</li>
+    <li class="breadcrumb-item"><a href="/patientList">รายการผู้ป่วย</a></li>
+    <li class="breadcrumb-item active">จัดการตำแหน่งผู้ป่วย</li>
+  </ol>
+  <!-- Condition Check-->
+  <% if(alert=="added") { %>
+    <div class="alert alert-success" role="alert">เพิ่มตำแหน่งใหม่สำเร็จ <a href="/patient<%= patient.id %>" name="refresh" name="refresh" >หากไม่ปรากฏในตารางกรุณาคลิกที่นี่</a></div>
+  <% } %> 
+  <% if(alert=="edited") { %>
+    <div class="alert alert-success" role="alert">บันทึกการเปลี่ยนแปลงสำเร็จ <a href="/patient<%= patient.id %>" name="refresh" name="refresh" >หากไม่ปรากฏในตารางกรุณาคลิกที่นี่</a></div>
+  <% } %> 
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6><b>ข้อมูลผู้ป่วย</b></h6><hr>
+      <form style="margin-bottom: -20px;">
+        <div class="form-row">
+          <div class="form-group col-md-2">ผู้ป่วยหมายเลข:&nbsp;<input class="form form-control col-md-2" name="patientID" id="patientID" value="<%= patient.id %>" readonly></div>
+          <div class="form-group col-md-2" style="margin-left: -80px;">บัญชีผู้ใช้:&nbsp;<input class="form form-control" name="" id="" value="<%= patient.data()['username'] %>" readonly></div>
+          <div class="form-group col-md-2" style="margin-left: 30px;">ชื่อผู้ป่วย:&nbsp;<input class="form form-control" name="" id="" value="<%= patient.data()['patientName'] %>" readonly></div>
+          <div class="form-group col-md-2" style="margin-left: 30px;">โรคที่เป็น:&nbsp;<input class="form form-control" name="" id="" value="<%= patient.data()['patientDisease'] %>" readonly></div>
+          <div class="form-group col-md-2" style="margin-left: 30px;">สถานะ:&nbsp;<input class="form form-control" name="" id="" value="<%= patient.data()['patientStatus'] %>" readonly></div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="card mb-4" name="location1" id="location1" style='display:<% if(upload=="true"){ %> none <% } %>;'>
+    <div class="card-header"><i class="fas fa-table mr-1"></i>ตารางข้อมูลตำแหน่งของผู้ป่วย
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="float: right;">เพิ่มตำแหน่ง</button>
+      <button type="button" class="btn btn-primary" style="float: right;" name="btnChange1" id="btnChange1" value="เพิ่มตำแหน่งจากไฟล์" onclick="btnChange1()">เพิ่มตำแหน่งจากไฟล์</button>
+      <form method="post" action="/patient<%= patient.id %>" id="addForm" name="addForm" onsubmit="return addFormValidate()">
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">เพิ่มตำแหน่งใหม่</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-row">
+                  <div class="col-md mb-3">
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Lat</i></span>
+                      </div>
+                      <input class="form-control" size="16" type="text" value="" name="lat" id="lat" placeholder="กรุณากรอกละติจูด">
+                    </div>
+                    <div name="latFeedback" id="latFeedback" style="margin-top: -20px; color: red;"></div>
+                  </div>
+                  <div class="col-md mb-3">
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Lng</i></span>
+                      </div>
+                      <input class="form-control" size="16" type="text" value="" name="lng" id="lng" placeholder="กรุณากรอกลองติจูด" >
+                    </div>
+                    <div name="lngFeedback" id="lngFeedback" style="margin-top: -20px; color: red;"></div>
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
+                    </div>
+                    <input class="form-control date form_datetime" size="16" type="text" value="" name="timestamp" id="timestamp" placeholder="เช่น 2020-05-12 05:30">
+                  </div>
+                  <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="timestampFeedback" id="timestampFeedback"></div>
+                  <div class="input-group mb-3">
+                    <textarea class="form-control" size="16" type="text" value="" name="detail" id="detail" timestampplaceholder="กรุณากรอกรายละเอียด"></textarea>
+                  </div>
+                  <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="detailFeedback" id="detailFeedback"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                  <button type="submit" class="btn btn-primary">เพิ่ม</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+              <tr>
+              <th>No.</th>
+              <th>ตำแหน่งละติจูด</th>
+              <th>ตำแหน่งลองติจูด</th>
+              <th>ประทับเวลา GMT+0700 (Indochina Time)</th>
+              <th>รายละเอียดเพิ่มเติม</th>
+              <th>การจัดการ</th>
+              </tr>
+          </thead>
+          <tfoot>
+              <tr>
+              <th>No.</th>
+              <th>ตำแหน่งละติจูด</th>
+              <th>ตำแหน่งลองติจูด</th>
+              <th>ประทับเวลา GMT+0700 (Indochina Time)</th>
+              <th>รายละเอียดเพิ่มเติม</th>
+              <th>การจัดการ</th>
+              </tr>
+          </tfoot>
+          <tbody>
+            <% patLoc.forEach(function(e) { %>
+            <tr>
+                <th scope="row"><%= Number(e.id)+1 %> </th>
+                <td><%= e.data()['lat'] %></td>
+                <td><%= e.data()['lng'] %></td>
+                <td><%= moment(e.timestamp).format('Do MMMM YYYY - HH:mm:ss') %></td>
+                <td><%= e.data()['desc'] %></td>
+                <td>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= e.patientLID %>" id="editID<%= e.patientLID %>">แก้ไข</button>
+                <!-- Modal -->
+                <form method="post" action="/editPatient<%= patient.id %>" id="editForm" name="editForm" onsubmit="return editFormValidate()">
+                  <div class="modal fade" id="edit<%= e.patientLID %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= e.patientLID %>Label" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="edit<%= e.patientLID %> Label">เพิ่มตำแหน่งใหม่</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <input name="lid" id="lid" value="<%= e.patientLID %>" hidden>
+                          <div class="form-row">
+                            <div class="col-md mb-3">
+                              <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text" id="basic-addon1">Lat</i></span>
+                                </div>
+                                <input class="form-control" size="16" type="text" value="<%= e.data()['lat'] %>" name="lat" id="lat" placeholder="กรุณากรอกละติจูด">
+                              </div>
+                              <div name="latFeedback" id="latFeedback" style="margin-top: -20px; color: red;"></div>
+                            </div>
+                            <div class="col-md mb-3">
+                              <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text" id="basic-addon1">Lng</i></span>
+                                </div>
+                                <input class="form-control" size="16" type="text" value="<%= e.data()['lng'] %>" name="lng" id="lng" placeholder="กรุณากรอกลองติจูด" >
+                              </div>
+                              <div name="lngFeedback" id="lngFeedback" style="margin-top: -20px; color: red;"></div>
+                            </div>
+                            <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
+                              </div>
+                              <input class="form-control date form_datetime" size="16" type="text" value="<%= moment(e.timestamp).format('DD/MM/YYYY HH:mm:ss') %> %>" name="timestamp" id="timestamp" placeholder="เช่น 2020-05-12 05:30">
+                            </div>
+                            <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="timestampFeedback" id="timestampFeedback"></div>
+                            <div class="input-group mb-3">
+                              <textarea class="form-control" size="16" type="text" value="<%= e.data()['desc'] %>" name="detail" id="detail" timestampplaceholder="กรุณากรอกรายละเอียด"><%= e.data()['desc'] %></textarea>
+                            </div>
+                            <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="detailFeedback" id="detailFeedback"></div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                            <button type="editSubmit" class="btn btn-primary">บันทึกการแก้ไข</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-4" name="location2" id="location2" style='display:none<% if(upload=="true"){ %> block <% } %>;'>
+    <div class="card-header"><i class="fas fa-table mr-1"></i>ตารางข้อมูลตำแหน่งของผู้ป่วย
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" style="float: right;">เพิ่มตำแหน่ง</button>
+      <button type="button" class="btn btn-primary" style="float: right;" name="btnChange2" id="btnChange2" value="ตารางข้อมูลตำแหน่ง" onclick="btnChange2()">ตารางข้อมูลตำแหน่ง</button>
+      <form method="post" action="/patient<%= patient.id %>" id="addForm" name="addForm" onsubmit="return addFormValidate()">
+        <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel2">เพิ่มตำแหน่งใหม่</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-row">
+                  <div class="col-md mb-3">
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Lat</i></span>
+                      </div>
+                      <input class="form-control" size="16" type="text" value="" name="lat" id="lat" placeholder="กรุณากรอกละติจูด">
+                    </div>
+                    <div name="latFeedback" id="latFeedback" style="margin-top: -20px; color: red;"></div>
+                  </div>
+                  <div class="col-md mb-3">
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Lng</i></span>
+                      </div>
+                      <input class="form-control" size="16" type="text" value="" name="lng" id="lng" placeholder="กรุณากรอกลองติจูด" >
+                    </div>
+                    <div name="lngFeedback" id="lngFeedback" style="margin-top: -20px; color: red;"></div>
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
+                    </div>
+                    <input class="form-control date form_datetime" size="16" type="text" value="" name="timestamp" id="timestamp" placeholder="เช่น 2020-05-12 05:30">
+                  </div>
+                  <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="timestampFeedback" id="timestampFeedback"></div>
+                  <div class="input-group mb-3">
+                    <textarea class="form-control" size="16" type="text" value="" name="detail" id="detail" timestampplaceholder="กรุณากรอกรายละเอียด"></textarea>
+                  </div>
+                  <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="detailFeedback" id="detailFeedback"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                  <button type="submit" class="btn btn-primary">เพิ่ม</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body">
+      <div class="card-body">
+        <form action="/patientloc<%= patient.id %>" method="post" enctype="multipart/form-data">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-10">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" name="filetoupload" id="filetoupload">
+                  <label class="custom-file-label" for="filetoupload" name="filelabel" id="filelabel">Choose file</label>
+                </div>
+              </div>
+              <div class="col-sm">
+                <input type="submit" class="btn btn-secondary">
+                <a href="patlocadd" name="addAllLoc" id="addAllLoc" class="btn btn-secondary" onclick="return addAllLoc()" style='display:none<% if(upload=="true" && alert!="notEquals"){ %> block <% } %>;'>เพิ่ม<a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <% if(alert=="notEquals") { %>
+        <div class="alert alert-danger" role="alert">หมายเลขผู้ป่วยไม่ตรงกันกรุณาตรวจสอบข้อมูล</div>
+      <% } %> 
+      <% if(upload == "true"){ %>
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+              <tr>
+                  <th>Patient ID</th>
+                  <th>Name</th>
+                  <th>lat</th>
+                  <th>lng</th>
+                  <th>Timestamp</th>
+                  <th>Desc</th>
+              </tr>
+          </thead>
+          <tfoot>
+              <tr>
+                  <th>Patient ID</th>
+                  <th>Name</th>
+                  <th>lat</th>
+                  <th>lng</th>
+                  <th>Timestamp</th>
+                  <th>Desc</th>
+              </tr>
+          </tfoot>
+          <tbody>
+              <% data.forEach(function(e) { %>
+              <tr>
+                  <td><input name="patID" id="patID" value="<%= e['0'] %>" hidden><%= e['0'] %></td>
+                  <td><%= e['1'] %></td>
+                  <td><%= e['2'] %></td>
+                  <td><%= e['3'] %></td>
+                  <td><%= e['4'] %></td>
+                  <td><%= e['5'] %></td>
+              </tr>
+              <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+  var numbers = /^-?\d*(\.\d+)?$/;
+
+  $(".form_datetime").datetimepicker({
+    language:  'th',
+    format: 'yyyy-mm-dd hh:ii'
+  });
+
+  function btnChange1() {
+    document.getElementById('location1').style.display = "none";
+    document.getElementById('location2').style.display = "block";
+  }
+
+  function btnChange2() {
+    document.getElementById('location1').style.display = "block";
+    document.getElementById('location2').style.display = "none";
+  }
+
+  function addAllLoc() {
+    var conf = confirm("หากมั่นใจแล้วกรุณากดปุ่มตกลง");
+    if(conf == true){
+      return true
+    }else{
+      return false
+    }
+  }
+
+  function addFormValidate() {
+    var lat = document.forms['addForm']['lat']
+    var lng = document.forms['addForm']['lng']
+    var timestamp = document.forms['addForm']['timestamp']
+    var desc = document.forms['addForm']['detail']
+    var check1 = document.forms['addForm']['locationChecked1']
+    var check2 = document.forms['addForm']['locationChecked2']
+
+    if(lat.value != "" && lat.value.match(numbers) && lng.value != "" && lng.value.match(numbers) && detail.value != "" && (check1.checked == true || check2.checked == true )){
+      var result = confirm("หากมั่นใจแล้วโปรดกดปุ่มตกลง")
+      document.getElementById('latFeedback').innerHTML = ""
+      document.getElementById('lngFeedback').innerHTML = ""
+      document.getElementById('timestampFeedback').innerHTML = ""
+      document.getElementById('detailFeedback').innerHTML = ""
+      document.getElementById('locationFeedback').innerHTML = ""
+      if (result) {
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      if(lat.value == "" ){
+        document.getElementById('latFeedback').innerHTML = "กรุณากรอกข้อมูลก่อน"
+      }else if(!lat.value.match(numbers)){
+        document.getElementById('latFeedback').innerHTML = "ต้องเป็นตัวเลขเท่านั้น"
+      }else{
+        document.getElementById('latFeedback').innerHTML = ""
+      }
+      if(lng.value == "" ){
+        document.getElementById('lngFeedback').innerHTML = "กรุณากรอกข้อมูลก่อน"
+      }else if(!lng.value.match(numbers)){
+        document.getElementById('lngFeedback').innerHTML = "ต้องเป็นตัวเลขเท่านั้น"
+      }else{
+        document.getElementById('lngFeedback').innerHTML = ""
+      }
+      if(detail.value == "" ){
+        document.getElementById('detailFeedback').innerHTML = "กรุณากรอกรายละเอียด"
+      }else{
+        document.getElementById('detailFeedback').innerHTML = ""
+      }
+      if(check1.checked == false && check2.checked == false){
+        document.getElementById('locationFeedback').innerHTML = "กรุณาเลือกตำแหน่งปัจจุบัน"
+      }else{
+        document.getElementById('locationFeedback').innerHTML = ""
+      }
+      return false;
+    }
+  }
+
+  function editFormValidate() {
+    var lat = document.forms['editForm']['lat']
+    var lng = document.forms['editForm']['lng']
+    var timestamp = document.forms['editForm']['timestamp']
+    var desc = document.forms['editForm']['detail']
+    var check1 = document.forms['editForm']['ch1']
+    var check2 = document.forms['editForm']['ch2']
+
+    if(lat.value != "" && lat.value.match(numbers) && lng.value != "" && lng.value.match(numbers) && detail.value != "" && (check1.checked == true || check2.checked == true )){
+      var result = confirm("หากมั่นใจแล้วโปรดกดปุ่มตกลง")
+      document.getElementById('latFeedback').innerHTML = ""
+      document.getElementById('lngFeedback').innerHTML = ""
+      document.getElementById('timestampFeedback').innerHTML = ""
+      document.getElementById('detailFeedback').innerHTML = ""
+      document.getElementById('locationFeedback').innerHTML = ""
+      if (result) {
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      if(lat.value == "" ){
+        document.getElementById('latFeedback').innerHTML = "กรุณากรอกข้อมูลก่อน"
+      }else if(!lat.value.match(numbers)){
+        document.getElementById('latFeedback').innerHTML = "ต้องเป็นตัวเลขเท่านั้น"
+      }else{
+        document.getElementById('latFeedback').innerHTML = ""
+      }
+      if(lng.value == "" ){
+        document.getElementById('lngFeedback').innerHTML = "กรุณากรอกข้อมูลก่อน"
+      }else if(!lng.value.match(numbers)){
+        document.getElementById('lngFeedback').innerHTML = "ต้องเป็นตัวเลขเท่านั้น"
+      }else{
+        document.getElementById('lngFeedback').innerHTML = ""
+      }
+      if(detail.value == "" ){
+        document.getElementById('detailFeedback').innerHTML = "กรุณากรอกรายละเอียด"
+      }else{
+        document.getElementById('detailFeedback').innerHTML = ""
+      }
+      if(check1.checked == false && check2.checked == false){
+        document.getElementById('locationFeedback').innerHTML = "กรุณาเลือกตำแหน่งปัจจุบัน"
+      }else{
+        document.getElementById('locationFeedback').innerHTML = ""
+      }
+      return false;
+    }
+  }
+  $('#filetoupload').change(function(){
+    var res=$('#filetoupload').val();
+    var arr = res.split("\\");
+    var filename=arr.slice(-1)[0];
+    document.getElementById("filelabel").innerHTML = filename
+  });
+</script>

@@ -1,0 +1,53 @@
+<%- include('../includes/header.ejs') %> 
+<%- include('../includes/sidebar.ejs') %> 
+<title>รายการผู้ใช้งาน</title>
+<div class="container-fluid">
+    <h1 class="mt-4">รายการผู้ใช้งาน</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลผู้ใช้งาน</li>
+        <li class="breadcrumb-item active">รายการผู้ใช้งาน</li>
+    </ol>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>บัญชีผู้ใช้งาน</th>
+                            <th>ชื่อผู้ใช้งาน</th>
+                            <th>เบอร์โทรศัพท์</th>
+                            <th>Verification</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>บัญชีผู้ใช้งาน</th>
+                            <th>ชื่อผู้ใช้งาน</th>
+                            <th>เบอร์โทรศัพท์</th>
+                            <th>Verification</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <% user.forEach(function(e) { %>
+                            <tr>
+                              <th scope="row"><%= e.data()['username'] %> </th>
+                              <td><%= e.data()['name'] %></td>
+                              <td><%= e.data()['phoneNum'] %></td>
+                              <td><center><% if( e.data()['Verification'] == "verified"){ %> <i class="fas fa-check-circle" style="width: 30px; height: 30px; color: green;"></i> <% }else{ %> <i class="fas fa-times-circle" style="width: 30px; height: 30px; color: red;"> </i><% } %></center></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+    function formValidate() {
+        var username = document.forms['form']['username'].value
+        var name = document.forms['form']['name'].value
+        var PhoneNum = document.forms['form']['PhoneNum'].value
+    }
+</script>

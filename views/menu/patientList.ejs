@@ -1,0 +1,155 @@
+<%- include('../includes/header.ejs') %> 
+<%- include('../includes/sidebar.ejs') %> 
+<title>รายการผู้ป่วย</title>
+<div class="container-fluid">
+    <h1 class="mt-4">รายการผู้ป่วย</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลผู้ป่วย</li>
+        <li class="breadcrumb-item active">รายการผู้ป่วย</li>
+    </ol>
+    <% if(alert=="edited") { %>
+        <div class="alert alert-success" role="alert">บันทึกการเปลี่ยนแปลงสำเร็จ</div>
+    <% } %>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>บัญชีผู้ใช้</th>
+                            <th>ชื่อผู้ป่วย</th>
+                            <th>ชื่อของโรค</th>
+                            <th>สถานะของผู้ป่วย</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>No.</th>
+                            <th>บัญชีผู้ใช้</th>
+                            <th>ชื่อผู้ป่วย</th>
+                            <th>ชื่อของโรค</th>
+                            <th>สถานะของผู้ป่วย</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <% patient.forEach(function(e) { %>
+                            <tr>
+                              <th scope="row"><%= Number(e.id)+1 %> </th>
+                              <td><%= e.data()['username'] %></td>
+                              <td><%= e.data()['patientName'] %></td>
+                              <td><%= e.data()['patientDisease'] %></td>
+                              <td><%= e.data()['patientStatus'] %></td>
+                              <td>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= e.id %>" id="editID<%= e.id %>">
+                                    แก้ไข
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="edit<%= e.id %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= e.id %>Label" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="edit<%= e.id %>Label">คุณต้องการเพิ่มโรคชนิดใหม่นี้ใช่หรือไม่</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body"><form id="form" name="form" method="POST" action="/patientList" onsubmit="return formValidate()">
+                                                <div class="form-row">
+                                                  <div class="form-group col-md-3">
+                                                    <label for="patientID">หมายเลขผู้ป่วย</label>
+                                                    <input type="text" class="form-control" name="patientID" id="patientID" value="<%= e.id %>" readonly>
+                                                  </div>
+                                                  <div class="form-group col-md-4">
+                                                    <label for="username">ชื่อบัญชีผู้ใช้</label>
+                                                    <input type="text" class="form-control" name="username" id="username" value="<%= e.data()['username'] %>" readonly>
+                                                  </div>
+                                                  <div class="form-group col-md-5">
+                                                    <label for="patientName">ชื่อผู้ป่วย</label>
+                                                    <input type="text" class="form-control" name="patientName" id="patientName" value="<%= e.data()['patientName'] %>">
+                                                  </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                      <label for="diseaseNow" name="diseaseNowID" id="diseaseNowID" value="<%= e.diseaseID %>" >โรคที่ผู้ป่วยเป็น</label>
+                                                      <input type="text" class="form-control" name="diseaseNowID" id="diseaseNowID" value="<%= e.data()['patientDisease'] %>" hidden>
+                                                      <input type="text" class="form-control" id="diseaseNow" value="<%= e.data()['patientDisease'] %>" readonly>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                      <label for="diseaseNew">หากต้องการเปลี่ยน</label>
+                                                      <select name="diseaseNew" id="diseaseNew" class="selectpicker" value="" data-live-search="true" title="<%= e.diseaseName %>" data-hide-disabled="true" value="<%= e.diseaseID %>">
+                                                        <% disease.forEach(function(e) { %>
+                                                            <option value="<%= e.data()['diseaseName'] %>"><%= e.data()['diseaseName'] %></option>
+                                                          <% }); %>
+                                                      </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                      <label for="patStatNow">สถานะของผู้ป่วย</label>
+                                                      <input type="text" class="form-control" name="patStatNowID" id="patStatNowID" value="<%= e.data()['patientStatus'] %>" hidden>
+                                                      <input type="text" class="form-control" id="patStatNow" value="<%= e.data()['patientStatus'] %>" readonly>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                      <label for="inputPassword4">หากต้องการเปลี่ยน</label>
+                                                      <select name="patStatNew" id="patStatNew" class="selectpicker" value="" data-live-search="true" title="<%= e.data()['patientStatus'] %>" data-hide-disabled="true" value="<%= e.data()['patientStatus'] %>">
+                                                        <!--option selected>กรุณาเลือกโรคที่ต้องการเพิ่ม</option-->
+                                                        <% patStat.forEach(function(e) { %>
+                                                            <option value="<%= e.data()['statusName'] %>"><%= e.data()['statusName'] %></option>
+                                                          <% }); %>
+                                                      </select>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="editCancel">ยกเลิก</button>
+                                        <button type="submit" class="btn btn-primary mb-2" id="editSubmit">ยืนยัน</button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                <input type="button" class="btn btn-primary" onclick="location.href='/patient<%= e.id %>';" name="" id="editLocation<%= e.id %>" value="จัดการตำแหน่ง" />
+                              </td>
+                            </tr>
+                          <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+    function formValidate() {
+        var id = document.forms['form']['patientID'].value
+        var name = document.forms['form']['patientName'].value
+        var disease = document.forms['form']['diseaseNowID'].value
+        var patStat = document.forms['form']['patStatNowID'].value
+        var diseaseNew = document.forms['form']['diseaseNew'].value
+        var patStatNew = document.forms['form']['patStatNew'].value
+
+        if(diseaseNew != ""){
+            document.forms['form']['diseaseNowID'].value = diseaseNew
+        }
+        if(patStatNew != ""){
+            document.forms['form']['patStatNowID'].value = patStatNew
+        }
+
+        if(name != "" && disease != "" && patStat != "" && id != ""){
+            var result = confirm("หากมั่นใจแล้วโปรดกดปุ่มตกลง");
+            if (result) {
+                return true;
+            }else{
+                return false;
+            }
+        }else if(name == ""){
+            alert("ชื่อผู้ป่วยไม่สามารถว่างได้");
+            return false;
+        }
+    }
+</script>

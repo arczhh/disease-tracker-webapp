@@ -1,0 +1,44 @@
+<div class="nav">
+    <div class="sb-sidenav-menu-heading">Core</div>
+    <a class="nav-link" href="/dashboard"
+        ><div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+        Dashboard</a
+    >
+    <div class="sb-sidenav-menu-heading">Data Maintenance</div>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesPatient" aria-expanded="false" aria-controls="collapsePagesPatient"
+        ><div class="sb-nav-link-icon"><i class="fas fa-user-injured"></i></div>
+        จัดการข้อมูลผู้ป่วย
+        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div
+    ></a>
+    <div class="collapse" id="collapsePagesPatient" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+            <a class="nav-link" href="/addPatient" id="addPatient">เพิ่มผู้ป่วย</a>
+            <a class="nav-link " href="/patientList" id="patientList">รายการผู้ป่วย</a>
+        </nav>
+    </div>
+    <a class="nav-link collapsed" href="/user">
+        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+        จัดการข้อมูลผู้ใช้
+    </a>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages"
+        ><div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+        จัดการข้อมูลที่เกี่ยวข้อง
+        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div
+    ></a>
+    <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+            <a class="nav-link" href="/disease">โรค</a>
+            <a class="nav-link " href="/hospital">โรงพยาบาล</a>
+            <a class="nav-link " href="/province">จังหวัด</a>
+            <a class="nav-link " href="/patStat">สถานะของผู้ป่วย</a>
+        </nav>
+    </div>
+    <div class="sb-sidenav-menu-heading">Addons</div>
+    <a class="nav-link" href="dist/charts.html"
+        ><div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+        Charts</a
+    ><a class="nav-link" href="dist/tables.html"
+        ><div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+        Tables</a
+    >
+</div>

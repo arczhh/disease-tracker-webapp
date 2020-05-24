@@ -1,0 +1,214 @@
+<title>การจัดการจังหวัด</title>
+<%- include('../includes/header.ejs') %> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- Google Maps JavaScript Library -->
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyBrItP1Jb1JCixbxxwYnqMmtQU198J_72g"></script>
+<%- include('../includes/sidebar.ejs') %> 
+<div class="container-fluid">
+    <h1 class="mt-4">การจัดการจังหวัด</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลที่เกี่ยวข้อง</li>
+        <li class="breadcrumb-item active">จังหวัด</li>
+    </ol>
+    <% if(alert=="saved") { %>
+        <div class="alert alert-success" role="alert">เพิ่มจังหวัดสำเร็จ</div>
+    <% } else if(alert=="edited") { %>
+        <div class="alert alert-success" role="alert">บันทึกการเปลี่ยนแปลงข้อมูลแล้ว</div>
+    <% } %>
+
+    <!-- Autocomplete location search input --> 
+    <div class="form-group">
+        <label>Location:</label>
+        <input type="text" class="form-control" id="search_input" placeholder="Type address..." />
+        <input type="hidden" id="loc_lat" />
+        <input type="hidden" id="loc_long" />
+    </div>
+
+    <!-- Display latitude and longitude -->
+    <div class="latlong-view" hidden>
+        <p><b>Latitude:</b> <span id="latitude_view"></span></p>
+        <p><b>Longitude:</b> <span id="longitude_view"></span></p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="form-inline center" method="POST" action="/province">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="inputNameAdd" class="center">ชื่อจังหวัด:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" name="inputNameAdd" id="inputNameAdd" placeholder="เช่น ขอนแก่น">
+                    <label for="inputLatAdd" class="center">&nbsp;&nbsp;&nbsp;&nbsp;ตำแหน่งละติจูด:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" name="inputLatAdd" id="inputLatAdd" placeholder="เช่น 16.46820918">
+                    <label for="inputLngAdd" class="center">&nbsp;&nbsp;&nbsp;&nbsp;ตำแหน่งลองติจูด:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" name="inputLngAdd" id="inputLngAdd" placeholder="เช่น 102.82775044">
+                    <!-- Button trigger modal -->
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="displayResult()">
+                        เพิ่ม
+                    </button>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">คุณต้องการเพิ่มจังหวัดใหม่นี้ใช่หรือไม่</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <label id="name"></label>
+                            <label id="location"></label>
+                            <label id="alert" style="color: red;"></label>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary mb-2" id="addSubmit">ยืนยัน</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header"><i class="fas fa-table mr-1"></i>ตารางข้อมูลจังหวัด</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>จังหวัด</th>
+                            <th>ตำแหน่งละติจูด</th>
+                            <th>ตำแหน่งลองติจูด</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>จังหวัด</th>
+                            <th>ตำแหน่งละติจูด</th>
+                            <th>ตำแหน่งลองติจูด</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <% province.forEach(function(e) { %>
+                            <tr>
+                              <th scope="row"><%= Number(e.id)+1 %> </th>
+                              <td><%= e.data()['provinceName'] %></td>
+                              <td><%= e.data()['lat'] %></td>
+                              <td><%= e.data()['lng'] %></td>
+                              <td>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= Number(e.id)+1 %>" id="editID<%= Number(e.id)+1 %>">
+                                    แก้ไข
+                                </button>
+                                <!-- Modal -->
+                                <form class="form-inline" method="POST" action="/editprovince">
+                                <div class="modal fade" id="edit<%= Number(e.id)+1 %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= Number(e.id)+1 %>Label" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="edit<%= Number(e.id)+1 %>Label">แก้ไขจังหวัด</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="card">
+                                                <table class="table table">
+                                                    <tbody>
+                                                        <tr>
+                                                        <th>หมายเลขไอดี</th>
+                                                        <td><input type="text" class="form-control" name="provinceID" id="provinceID" placeholder="<%= Number(e.id)+1 %>" value="<%= e.id %>" readonly></td>
+                                                        </tr>
+                                                        <tr>
+                                                        <th>จังหวัด</th>
+                                                        <td><input type="text" class="form-control" name="provinceName" id="provinceName" placeholder="กรุณากรอกชื่อ" value="<%= e.data()['provinceName'] %>"></td>
+                                                        </tr>
+                                                        <tr>
+                                                        <th>ละติจูด</th>
+                                                        <td><input type="text" class="form-control" name="lat" id="lat" placeholder="กรุณากรอกละติจูด" value="<%= e.data()['lat'] %>"></td>
+                                                        </tr>
+                                                        <tr>
+                                                        <th>ลองติจูด</th>                                                            
+                                                        <td><input type="text" class="form-control" name="lng" id="lng" placeholder="กรุณากรอกลองติจูด" value="<%= e.data()['lng'] %>"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <label id="msgAlert" style="color: red;"></label>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="editCancel<%= e.hospitalID %>">ยกเลิก</button>
+                                        <button type="submit" class="btn btn-primary mb-2" id="editSavecheck<%= e.hospitalID %>">ยืนยัน</button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </form>
+                              </td>
+                            </tr>
+                          <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+    function displayResult() {
+        var numbers = /^-?\d*(\.\d+)?$/;
+        var isLatNumber = document.getElementById("inputLatAdd").value.match(numbers)
+        var isLngNumber = document.getElementById("inputLngAdd").value.match(numbers)
+        var isEmpty = document.getElementById("inputLatAdd").value == "" || document.getElementById("inputLngAdd").value == "" || document.getElementById("inputNameAdd").value == ""
+        document.getElementById("name").innerHTML = "จังหวัดที่คุณต้องการเพิ่ม คือ<b>&nbsp;"+document.getElementById("inputNameAdd").value+"</b>";
+        document.getElementById("location").innerHTML = "ตำแหน่งของจังหวัด คือ<b>&nbsp;"+document.getElementById("inputLatAdd").value+","+document.getElementById("inputLngAdd").value+"</b>";
+        if(isEmpty){
+            document.getElementById("alert").innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            document.getElementById('addSubmit').style.visibility = 'hidden';
+        }else if(!isLatNumber || !isLngNumber){
+            document.getElementById("alert").innerHTML = "ตำแหน่งละติจูดและลองติจูด ต้องเป็นตัวเลขเท่านั้น";
+            document.getElementById('addSubmit').style.visibility = 'hidden';
+        }else{
+            document.getElementById("alert").innerHTML = "";
+            document.getElementById('addSubmit').style.visibility = 'visible';
+        }
+    }
+
+    var searchInput = 'search_input';
+    
+    $(document).ready(function () {
+        var autocomplete;
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById(searchInput)), {
+            types: ['geocode'],
+        });
+        
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            var near_place = autocomplete.getPlace();
+            document.getElementById('loc_lat').value = near_place.geometry.location.lat();
+            document.getElementById('loc_long').value = near_place.geometry.location.lng();
+            
+            document.getElementById('latitude_view').innerHTML = near_place.geometry.location.lat();
+            document.getElementById('longitude_view').innerHTML = near_place.geometry.location.lng();
+    
+            document.getElementById('inputNameAdd').value = document.getElementById(searchInput).value;
+    
+            document.getElementById('inputLatAdd').value = near_place.geometry.location.lat();
+            document.getElementById('inputLngAdd').value = near_place.geometry.location.lng();
+        });
+    });
+    $(document).on('change', '#'+searchInput, function () {
+        document.getElementById('latitude_input').value = '';
+        document.getElementById('longitude_input').value = '';
+        
+        document.getElementById('latitude_view').innerHTML = '';
+        document.getElementById('longitude_view').innerHTML = '';
+    });
+</script>

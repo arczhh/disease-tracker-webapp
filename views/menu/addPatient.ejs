@@ -1,0 +1,232 @@
+<%- include('../includes/header.ejs') %> 
+<%- include('../includes/sidebar.ejs') %> 
+<div class="container-fluid">
+    <h1 class="mt-4">เพิ่มผู้ป่วย</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลผู้ป่วย</li>
+        <li class="breadcrumb-item active">เพิ่มผู้ป่วย</li>
+    </ol>
+    <!-- First page -->
+    <div class="card" style="width: 100%; height: 100%; margin-top:120px; border: none;" id="page1">
+        <div class="card-body"><center>
+          <h3 class="card-title"><b>การลงทะเบียนข้อมูลผู้ป่วย</b></h3>
+          <h6 class="card-subtitle mb-2 text-muted">ข้อกำหนด</h6>
+          <p class="card-text">หากผู้ป่วยมีบัญชีในระบบอยู่แล้วโปรดเลือก ลงทะเบียนแบบมีบัญชีเพื่อใช้งาน เพื่อเชื่อมต่อข้อมูลของผู้ป่วยกับบัญชีผู้ใช้งาน</p>
+          <div class="row" style="width: 50%;">
+            <div class="custom-control custom-radio col">
+                <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" value="yes" onclick="handleClick(this)">
+                <label class="custom-control-label" for="customRadio1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;มีบัญชีผู้ใช้งาน</label>
+              </div>
+            <div class="custom-control custom-radio col">
+                <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input" value="no" onclick="handleClick(this)">
+                <label class="custom-control-label" for="customRadio2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ไม่มีบัญชีผู้ใช้งาน</label>
+            </div>
+          </div><p id="br1"></p>
+          <div id="userSearch" style="display: none;" class="col-md-6">
+            <select name="userInfo" id="userInfo" value="" class="selectpicker form-control" data-live-search="true" title="ค้นหาผู้ใช้งานจากที่นี่.." data-hide-disabled="true" onclick="selectUser(this)">
+                <!--option selected>กรุณาเลือกโรคที่ต้องการเพิ่ม</option-->
+                <% user.forEach(function(e) { %>
+                    <option value="<%= e.data()['username'] %>|<%= e.data()['name'] %>"><%= e.data()['username'] %> - <%= e.data()['name'] %></option>
+                <% }); %>
+            </select>
+          </div><p id="br2" style="color:red;"></p>
+          <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off" id="next-btn" style="display: none;" onclick="next()">
+            ถัดไป
+          </button>
+          <p id="test"></p>
+          <% if(alert == "saved"){ %> 
+            <div class='alert alert-success' role='alert'>เพิ่มข้อมูลผู้ป่วยสำเร็จ !</div>
+        <% } %>
+        </center></div>
+    </div>
+    <!-- By user information -->
+    <div class="card " style="width: 100%; height: 100%; display: none; border: none;" id="page2" >
+        <div class="card-body"><center>
+            <h5 class="card-title"><b>ลงทะเบียนผู้ป่วยแบบมีบัญชีผู้ใช้</b></h5>
+            <div class="card" style="width: 60%; vertical-align: middle;"  align="left">
+                <div class="card-body">
+                    <form method="POST" action="/addPatient" name="addPatientForm" id="addPatientForm" onsubmit="return validateForm()">
+                        <div class="form-group">
+                            <label for="inputName"><b>ชื่อ</b></label>
+                            <input type="text" class="form-control" name="inputName" id="inputName" value="" placeholder="กรุณากรอกชื่อ">
+                            <label for="patStat" style="color: red; display: none;" id="alertName">กรุณากรอกชื่อของผู้ป่วย</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="disease"><b>โรคที่เป็น</b></label>
+                            <select name="disease" id="disease" class="selectpicker" value="" data-live-search="true" title="กรุณาเลือกโรค" data-hide-disabled="true">
+                                <% disease.forEach(function(e) { %>
+                                    <option value="<%= e.data()['diseaseName'] %>"><%= e.data()['diseaseName'] %></option>
+                                  <% }); %>
+                            </select>
+                            <label for="disease" style="color: red; display: none;" id="alertDisease">โปรดเลือกโรคของผู้ป่วย</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="patStat"><b>สถานะของผู้ป่วย</b></label>
+                            <select name="patStat" id="patStat" class="selectpicker" value="" data-live-search="true" title="กรุณาเลือกโรค" data-hide-disabled="true">
+                                <!--option selected>กรุณาเลือกโรคที่ต้องการเพิ่ม</option-->
+                                <% patStat.forEach(function(e) { %>
+                                    <option value="<%= e.data()['statusName'] %>"><%= e.data()['statusName'] %></option>
+                                  <% }); %>
+                            </select>
+                            <label for="patStat" style="color: red; display: none;" id="alertPatStat">โปรดเลือกสถานะของผู้ป่วย</label>
+                        </div>
+                        <hr>
+                        <p><b>ข้อมูลบัญชีผู้ใช้</b></p>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <input type="text" class="form-control" name="username"  id="username" value="" readonly>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <input type="text" class="form-control" name="usersname" id="usersname" value="" readonly>
+                          </div>
+                        </div>
+                        <div align="center">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">ลงทะเบียน</button>
+                            <button type="button" class="btn btn-primary" id="back-btn" onclick="back()">ย้อนกลับ</button>
+                        </div>
+                      </form>
+                </div>
+            </div>
+        </center></div>
+    </div>
+    <!-- Without user information -->
+    <div class="card " style="width: 100%; height: 100%; display: none; border: none;" id="page3" >
+        <div class="card-body"><center>
+            <h5 class="card-title"><b>ลงทะเบียนผู้ป่วยแบบไม่มีบัญชีผู้ใช้</b></h5>
+            <div class="card" style="width: 60%; vertical-align: middle;"  align="left">
+                <div class="card-body">
+                    <form method="POST" action="/addPatient" name="addPatientForm2" id="addPatientForm2" onsubmit="return validateForm2()">
+                        <div class="form-group">
+                            <label for="inputName"><b>ชื่อ</b></label>
+                            <input type="text" class="form-control" name="inputName" id="inputName" value="" placeholder="กรุณากรอกชื่อ">
+                            <label for="patStat" style="color: red; display: none;" id="alertName2">กรุณากรอกชื่อของผู้ป่วย</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="disease"><b>โรคที่เป็น</b></label>
+                            <select name="disease" id="disease" class="selectpicker" value="" data-live-search="true" title="กรุณาเลือกโรค" data-hide-disabled="true">
+                                <% disease.forEach(function(e) { %>
+                                    <option value="<%= e.data()['diseaseName'] %>"><%= e.data()['diseaseName'] %></option>
+                                  <% }); %>
+                            </select>
+                            <label for="disease" style="color: red; display: none;" id="alertDisease2">โปรดเลือกโรคของผู้ป่วย</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="patStat"><b>สถานะของผู้ป่วย</b></label>
+                            <select name="patStat" id="patStat" class="selectpicker" value="" data-live-search="true" title="กรุณาเลือกโรค" data-hide-disabled="true">
+                                <!--option selected>กรุณาเลือกโรคที่ต้องการเพิ่ม</option-->
+                                <% patStat.forEach(function(e) { %>
+                                    <option value="<%= e.data()['statusName'] %>"><%= e.data()['statusName'] %></option>
+                                  <% }); %>
+                            </select>
+                            <label for="patStat" style="color: red; display: none;" id="alertPatStat2">โปรดเลือกสถานะของผู้ป่วย</label>
+                        </div>
+                        <input type="text" class="form-control" name="username"  id="username" value="" hidden>
+                        <div align="center">
+                            <button type="submit" class="btn btn-primary" id="submit-btn2">ลงทะเบียน</button>
+                            <button type="button" class="btn btn-primary" id="back-btn" onclick="back()">ย้อนกลับ</button>
+                        </div>
+                      </form>
+                </div>
+            </div>
+        </center></div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+    function handleClick(myRadio) {
+        if(myRadio.value == "yes"){
+            document.getElementById("userSearch").style.display = "block";
+            document.getElementById("next-btn").style.display = "block";
+            document.getElementById("br1").innerHTML = "<br>";
+            document.getElementById("br2").innerHTML = "<br>";
+            document.getElementById("test").value = "yes";
+        }else{
+            document.getElementById("userSearch").style.display = "none";
+            document.getElementById("next-btn").style.display = "block";
+            document.getElementById("br1").value = "<br>";
+            document.getElementById("br2").innerHTML = "";
+            document.getElementById("test").value = "no";
+        }
+    }
+
+    function next() {
+        document.getElementById("alertName").style.display = "none";
+        document.getElementById("alertDisease").style.display = "none";
+        document.getElementById("alertPatStat").style.display = "none";
+        document.getElementById("alertName2").style.display = "none";
+        document.getElementById("alertDisease2").style.display = "none";
+        document.getElementById("alertPatStat2").style.display = "none";
+        if(document.getElementById("userInfo").value == "" && document.getElementById("test").value == "yes"){
+            document.getElementById("br2").innerHTML = "<br>กรุณาเลือกบัญชีผู้ใช้งานก่อนการกดถัดไป";
+        }else{
+            var user = document.getElementById("userInfo").value.split("|")
+            if(document.getElementById("test").value == "yes"){
+                document.getElementById("br2").innerHTML = "<br>";
+                document.getElementById("page1").style.display = "none";
+                document.getElementById("page2").style.display = "block";
+                document.getElementById("username").value = user[0];
+                document.getElementById("usersname").value = user[1];
+                document.getElementById("inputName").value = user[1];
+            }else{
+                document.getElementById("page1").style.display = "none";
+                document.getElementById("page3").style.display = "block";
+            }
+        } 
+    }
+
+    function back() {
+        document.getElementById("page1").style.display = "block";
+        document.getElementById("page2").style.display = "none";
+        document.getElementById("page3").style.display = "none";
+    }
+
+    function validateForm() {
+        var name = document.forms["addPatientForm"]["inputName"].value;
+        var disease = document.forms["addPatientForm"]["disease"].value;
+        var patStat = document.forms["addPatientForm"]["patStat"].value;
+        if(name == "" || disease == "" || patStat == ""){
+            if(name == ""){
+                document.getElementById("alertName").style.display = "block";
+            }else{
+                document.getElementById("alertName").style.display = "none";
+            }
+            if(disease == ""){
+                document.getElementById("alertDisease").style.display = "block";
+            }else{
+                document.getElementById("alertDisease").style.display = "none";
+            }
+            if(patStat == ""){
+                document.getElementById("alertPatStat").style.display = "block";
+            }else{
+                document.getElementById("alertPatStat").style.display = "none";
+            }
+            return false;
+        }
+    }
+
+    function validateForm2() {
+        var name = document.forms["addPatientForm2"]["inputName"].value;
+        var disease = document.forms["addPatientForm2"]["disease"].value;
+        var patStat = document.forms["addPatientForm2"]["patStat"].value;
+        if(name == "" || disease == "" || patStat == ""){
+            if(name == ""){
+                document.getElementById("alertName2").style.display = "block";
+            }else{
+                document.getElementById("alertName2").style.display = "none";
+            }
+            if(disease == ""){
+                document.getElementById("alertDisease2").style.display = "block";
+            }else{
+                document.getElementById("alertDisease2").style.display = "none";
+            }
+            if(patStat == ""){
+                document.getElementById("alertPatStat2").style.display = "block";
+            }else{
+                document.getElementById("alertPatStat2").style.display = "none";
+            }
+            return false;
+        }
+    }
+
+</script>

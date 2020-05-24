@@ -1,0 +1,19 @@
+<%- include('includes/sidebar.ejs') %> 
+<%- include('includes/header.ejs') %> 
+<center>
+<div class="card" style="width: 100%; height: 100%; padding: 100px 0; border: none;">
+    <div class="card-body">
+        <h5 class="card-title">
+            <% if(alert=="success") { %>
+                <h5 class="card-title"><i class="far fa-check-circle" style="color: green; width: 220px; height: 220px;"></i></h5>
+                <h6 class="card-subtitle mb-2" style="color: green;"><b>ดำเนินรายการเรียบร้อยแล้ว</b></h6>
+            <% }else{ %>
+                <h5 class="card-title"><i class="far fa-times-circle" style="color: red; width: 220px; height: 220px;"></i></h5>
+                <h6 class="card-subtitle mb-2" style="color: red;"><b>การดำเนินการผิดพลาด</b></h6>
+            <% } %>
+      <p class="card-text"><%= msg %></p>
+      <a href="<%= link %>" class="card-link">คลิกที่นี่เพื่อย้อนกลับ</a>
+    </div>
+  </div>
+</center>
+<%- include('includes/footer.ejs') %>

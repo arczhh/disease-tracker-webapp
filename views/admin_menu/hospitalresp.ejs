@@ -1,0 +1,151 @@
+<title>โรงพยาบาล</title>
+<%- include('../includes/header.ejs') %> 
+<%- include('../includes/sidebar.ejs') %> 
+<div class="container-fluid">
+    <h1 class="mt-4">โรคที่รับผิดชอบโดย <%= hospitalName %></h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item">จัดการข้อมูลที่เกี่ยวข้อง</li>
+        <li class="breadcrumb-item"><a href="/hospital">โรงพยาบาล</a></li>
+        <li class="breadcrumb-item active"><%= hospitalName %></li>
+    </ol>
+    <% if(alert=="added") { %>
+        <div class="alert alert-success" role="alert">เพิ่มโรคที่รับผิดชอบสำเร็จ</div>
+    <% } else if(alert=="edited") { %>
+        <div class="alert alert-success" role="alert">บันทึกการเปลี่ยนแปลงข้อมูลแล้ว</div>
+    <% } %>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="form-inline center" method="POST" action="/hospital<%= hospitalID %>">
+                <div class="form-group mx-sm-3 mb-2">
+                    <input type="text" class="form-control sr-only" name="inputHospitalID" id="inputHospitalID" value="<%= hospitalID %>" readonly>
+                    <label class="center" >ชื่อโรงพยาบาล:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" name="inputNameAdd" id="inputNameAdd" value="<%= hospitalName %>" readonly>
+                    <label for="inputLatAdd" class="center">&nbsp;&nbsp;&nbsp;&nbsp;โรคที่ต้องการเพิ่ม:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <select name="diseaseSelector" id="diseaseSelector" class="selectpicker" data-live-search="true" title="กรุณาเลือกโรค" data-hide-disabled="true">
+                        <!--option selected>กรุณาเลือกโรคที่ต้องการเพิ่ม</option-->
+                        <% disease.forEach(function(e) { %>
+                            <option value="<%= e.id %> - <%= e.data()['diseaseName'] %>"><%= e.id %> - <%= e.data()['diseaseName'] %></option>
+                          <% }); %>
+                    </select>
+                    <!-- Button trigger modal -->
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="displayResult()">
+                        เพิ่ม
+                    </button>
+                </div>          
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">คุณต้องการเพิ่มโรงพยาบาลใหม่นี้ใช่หรือไม่</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <label id="name"></label>
+                            <label id="location"></label>
+                            <label id="alert" style="color: red;"></label>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary mb-2" id="addSubmit">ยืนยัน</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header"><i class="fas fa-table mr-1"></i>ตารางข้อมูลโรงพยาบาล</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>ชื่อโรคที่รับผิดชอบ</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>หมายเลขไอดี</th>
+                            <th>ชื่อโรคที่รับผิดชอบ</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <% if(diseaseRes != ""){
+                           diseaseRes.forEach(function(e) { %>
+                            <tr>
+                              <th scope="row"><%= Number(e.id)+1 %> </th>
+                              <td><%= e.data()['diseaseName'] %></td>
+                              <td>
+                              </td>
+                            </tr>
+                          <% }); 
+                        } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../includes/footer.ejs') %>
+<script>
+function createOptions(number) {
+  var options = [], _options;
+
+  for (var i = 0; i < number; i++) {
+    var option = '<option value="' + i + '">Option ' + i + '</option>';
+    options.push(option);
+  }
+
+  _options = options.join('');
+  
+  $('#number')[0].innerHTML = _options;
+  $('#number-multiple')[0].innerHTML = _options;
+
+  $('#number2')[0].innerHTML = _options;
+  $('#number2-multiple')[0].innerHTML = _options;
+}
+
+var mySelect = $('#first-disabled2');
+
+createOptions(4000);
+
+$('#special').on('click', function () {
+  mySelect.find('option:selected').prop('disabled', true);
+  mySelect.selectpicker('refresh');
+});
+
+$('#special2').on('click', function () {
+  mySelect.find('option:disabled').prop('disabled', false);
+  mySelect.selectpicker('refresh');
+});
+
+$('#basic2').selectpicker({
+  liveSearch: true,
+  maxOptions: 1
+});
+
+function displayResult() {
+        var isEmpty = document.getElementById("diseaseSelector").value == "" || document.getElementById("inputHospitalID").value == "" || document.getElementById("inputNameAdd").value == ""
+        document.getElementById("name").innerHTML = "โรงพยาบาลที่คุณต้องการเพิ่ม คือ<b>&nbsp;"+document.getElementById("inputNameAdd").value+", หมายเลขไอดี: "+document.getElementById("inputHospitalID").value+"</b>";
+        document.getElementById("location").innerHTML = "โรคที่รับผิดชอบ คือ<b>&nbsp;"+document.getElementById("diseaseSelector").value+"</b>";
+        if(isEmpty){
+            document.getElementById("alert").innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            document.getElementById('addSubmit').style.visibility = 'hidden';
+        }else if(!isLatNumber || !isLngNumber){
+            document.getElementById("alert").innerHTML = "ตำแหน่งละติจูดและลองติจูด ต้องเป็นตัวเลขเท่านั้น";
+            document.getElementById('addSubmit').style.visibility = 'hidden';
+        }else{
+            document.getElementById("alert").innerHTML = "";
+            document.getElementById('addSubmit').style.visibility = 'visible';
+        }
+    }
+</script>
