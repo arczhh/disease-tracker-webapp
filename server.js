@@ -357,7 +357,6 @@ function editPatStat(patStatName,patStatNameNew,patStatID,req,res){
 }
 
 function editPatient(id,name,disease,patStat,req,res){
-  console.log(id+","+name+","+disease+","+patStat)
   if (req.session.loggedin && req.session.role == "Admin") {
     firebase.firestore().collection("patient").doc(`${id}`).update({
       patientName: name,
@@ -368,9 +367,9 @@ function editPatient(id,name,disease,patStat,req,res){
   }
 }
 
-function editPatientLocation(id,lat,lng,timestamp,desc,req,res){
+function editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res){
   if (req.session.loggedin && req.session.role == "Admin") {
-    firebase.firestore().collection(`patient/${id}/location`).doc(`${id}`).update({
+    firebase.firestore().collection(`patient/${id}/location`).doc(`${lid}`).update({
       lat: Number(lat),
       lng: Number(lng),
       timestamp: timestamp,
@@ -653,12 +652,13 @@ app.post('/patient:id', function(req, res) {
 });
 
 app.post('/editPatient:id', function(req, res) {
-  var id = req.params.lid;
+  var id = req.body.id;
+  var lid = req.body.lid;
   var lat = req.body.lat;
   var lng = req.body.lng;
   var desc = req.body.detail;
   var timestamp = req.body.timestamp;
-  editPatientLocation(id,lat,lng,timestamp,desc,req,res)
+  editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res)
 });
 
 // User
