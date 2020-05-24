@@ -287,9 +287,7 @@ function editHospital(id,name,lat,lng,req,res){
         lat: lat,
         lng: lng
       });
-      hospitalData(function(data){           
-        res.render("admin_menu/hospital.ejs",{ email: req.session.email, role: req.session.role, hospital: data, alert: "edited" })
-      });
+      alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงโรงพยาบาลสำเร็จ","/hospital",req,res)
     }else{
       res.redirect('/hospital')
   }	
@@ -313,9 +311,7 @@ function editDisease(id,newName,oldName,req,res){
         })
       });
     })
-    diseaseData(function(data){           
-      res.render("admin_menu/disease.ejs",{ email: req.session.email, role: req.session.role, disease: data, alert: "edited" })
-    });
+    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงโรคสำเร็จ","/disease",req,res)
   }
 }
 
@@ -326,9 +322,7 @@ function editProvince(id,name,lat,lng,req,res){
       lat: Number(lat),
       lng: Number(lng)
     });
-    provinceData(function(data){           
-      res.render("admin_menu/province.ejs",{ email: req.session.email, role: req.session.role, province: data, alert: "edited" })
-    });
+    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงจังหวัดสำเร็จ","/province",req,res)
   }
 }
 
@@ -350,9 +344,7 @@ function editPatStat(patStatName,patStatNameNew,patStatID,req,res){
         })
       });
     })
-    patientStatusData(function(patStat){           
-      res.render("admin_menu/patStat.ejs",{ email: req.session.email, role: req.session.role, patStat: patStat, alert: "edited"})
-    });
+    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงสถานะของผู้ป่วยสำเร็จ","/patStat",req,res)
   }
 }
 
@@ -363,7 +355,7 @@ function editPatient(id,name,disease,patStat,req,res){
       patientDisease: disease,
       patientStatus: patStat
     });
-    alert("success","แก้ไขการเปลี่ยนแปลงผู้ป่วยสำเร็จ คลิกที่นี่เพื่อตรวจสอบรายการผู้ป่วย","/patientList",req,res)
+    alert("success","แก้ไขการเปลี่ยนแปลงผู้ป่วยสำเร็จ","/patientList",req,res)
   }
 }
 
@@ -375,6 +367,7 @@ function editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res){
       timestamp: timestamp,
       desc: desc
     });
+    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงโรงพยาบาลสำเร็จ","/hospital",req,res)
     patientPage(id,"edited","","false","",req,res);
   }
 }
@@ -384,7 +377,7 @@ app.get('/', function(req, res) {
   if (req.session.loggedin) {
       res.redirect('/dashboard');
   } else {
-    res.render('login.ejs',{ alert: "", ip: "os.networkInterfaces().vpngate-[1].address" });
+    res.render('login.ejs',{ alert: ""});
   }
 });
 
@@ -395,7 +388,7 @@ app.post('/', function(req, res) {
     firebase.firestore().collection("admin").where("email","==",email).get()
       .then(snapshot => {
         if (snapshot.empty) {
-          res.render('login.ejs',{ alert: "อีเมล ไม่ถูกต้อง", ip: "os.networkInterfaces().vpngate[1].address"  });
+          res.render('login.ejs',{ alert: "อีเมล ไม่ถูกต้อง" });
         }
         snapshot.forEach(doc => {
         if(bcrypt.compareSync(password+doc.data()["salt"], doc.data()["password"])) {
@@ -411,12 +404,12 @@ app.post('/', function(req, res) {
             }
         } else {
             // Passwords don't match
-            res.render('login.ejs',{ alert: "รหัสผ่าน ไม่ถูกต้อง", ip: "os.networkInterfaces().vpngate[1].address"  });
+            res.render('login.ejs',{ alert: "รหัสผ่าน ไม่ถูกต้อง" });
         }    
       });
     })
   } else {
-    res.render('login.ejs',{ alert: "กรุณากรอก อีเมลและรหัสผ่าน", ip: "os.networkInterfaces().vpngate[1].address }" });
+    res.render('login.ejs',{ alert: "กรุณากรอก อีเมลและรหัสผ่าน" });
     res.end();
   }
 });
