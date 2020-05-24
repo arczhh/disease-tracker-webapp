@@ -1,6 +1,6 @@
 const express = require('express');
 const firebase = require("firebase-admin");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const port = process.env.PORT || 3000;
 const session = require('express-session');
 const bodyParser = require('body-parser');

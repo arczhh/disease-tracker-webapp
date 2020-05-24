@@ -1,9 +1,9 @@
 {
   "name": "disease-tracker",
   "version": "1.0.0",
-  "engines": { 
-    "node": "8.9.4" 
- },
+  "engines": {
+    "node": "8.9.4"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^4.0.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "body-parser-csv": "^1.0.0",
     "cookie-parser": "^1.4.5",
