@@ -8,7 +8,7 @@ const moment = require('moment');
 const formidable = require('formidable');
 const neatCsv = require('neat-csv');
 const fs = require('fs-extra');
-const os = require('os');
+const crypto = require('crypto')
 const d = new Date();
 const app = express();
 const serviceAccount = require("./disease-tracker-91b76-firebase-adminsdk-mfz8y-f52e76a570.json");
@@ -398,7 +398,7 @@ app.post('/', function(req, res) {
           res.render('login.ejs',{ alert: "อีเมล ไม่ถูกต้อง", ip: "os.networkInterfaces().vpngate[1].address"  });
         }
         snapshot.forEach(doc => {
-        if(bcrypt.compareSync(password, doc.data()["password"])) {
+        if(bcrypt.compareSync(password+doc.data()["salt"], doc.data()["password"])) {
             // Passwords match
             req.session.loggedin = true;
             req.session.email = doc.data()["email"];
