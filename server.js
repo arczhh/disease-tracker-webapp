@@ -653,12 +653,11 @@ app.post('/patient:id', function(req, res) {
 });
 
 app.post('/editPatient:id', function(req, res) {
-  var id = req.params.id;
+  var id = req.params.lid;
   var lat = req.body.lat;
   var lng = req.body.lng;
   var desc = req.body.detail;
   var timestamp = req.body.timestamp;
-  console.log(timestamp)
   editPatientLocation(id,lat,lng,timestamp,desc,req,res)
 });
 
