@@ -184,9 +184,7 @@ function addHospital(name,lat,lng,req,res){
         lat: Number(lat),
         lng: Number(lng)
       });
-        hospitalData(function(data){           
-          res.render("admin_menu/hospital.ejs",{ email: req.session.email, role: req.session.role, hospital: data, alert: "saved" })
-      });
+      alert("success","เพิ่มโรงพยาบาลสำเร็จ","/hospital",req,res)
     })
   }else{
     res.redirect('/hospital')
@@ -200,7 +198,7 @@ function addHospitalResponsible(id,disease,req,res){
       firebase.firestore().collection(`hospital/${id}/responsible`).doc(`${snapshot.size}`).set({
         diseaseName: disease[2],
       });
-      hospitalPageID(id,alert,req,res)
+      alert("success","เพิ่มโรคที่รับผิดชอบสำเร็จ","/hospital"+id,req,res)
     })
   }
 }
@@ -212,9 +210,7 @@ function addDisease(name,req,res){
       firebase.firestore().collection("disease").doc(`${snapshot.size}`).set({
         diseaseName: name,
       });
-      diseaseData(function(disease){
-        res.render("admin_menu/disease.ejs",{ email: req.session.email, role: req.session.role, disease: disease, alert: "saved"})
-      })
+      alert("success","เพิ่มโรคสำเร็จ","/disease",req,res)
     })
   }
 }
@@ -228,9 +224,7 @@ function addProvince(name,lat,lng,req,res){
         lat: Number(lat),
         lng: Number(lng)
       });
-      provinceData(function(data){           
-        res.render("admin_menu/province.ejs",{ email: req.session.email, role: req.session.role, province: data, alert: "saved" })
-      });
+      alert("success","เพิ่มจังหวัดสำเร็จ","/province",req,res)
     })
   }
 }
@@ -242,9 +236,7 @@ function addPatStat(name,req,res){
       firebase.firestore().collection("patientStatus").doc(`${snapshot.size}`).set({
         statusName: name,
       });
-      patientStatusData(function(patStat){
-        res.render("admin_menu/patStat.ejs",{ email: req.session.email, role: req.session.role, patStat: patStat, alert: "saved"})
-      })
+      alert("success","เพิ่มสถานะผู้ป่วยสำเร็จ","/patStat"+id,req,res)
     })
   }
 }
@@ -258,7 +250,7 @@ function addPatient(name,disease,patStat,username,req,res){
       patientDisease: disease,
       patientStatus: patStat
     });
-    alert("success","ลงทะเบียนสำเร็จ คลิกที่นี่เพื่อตรวจสอบรายการผู้ป่วย","/patientList",req,res)
+    alert("success","ลงทะเบียนสำเร็จผู้ป่วยสำเร็จ","/patientList",req,res)
   })
 }
 
@@ -272,7 +264,7 @@ function addPatientLocation(id,lat,lng,desc,timestamp,req,res){
         timestamp: timestamp,
         desc: desc
       });
-      patientPage(id,"added","","false","",req,res);
+      alert("success","เพิ่มตำแหน่งผู้ป่วยสำเร็จ","/patient"+id,req,res)
     })
   }
 }
@@ -367,8 +359,7 @@ function editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res){
       timestamp: timestamp,
       desc: desc
     });
-    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงโรงพยาบาลสำเร็จ","/hospital",req,res)
-    patientPage(id,"edited","","false","",req,res);
+    alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงตำแหน่งของผู้ป่วยสำเร็จ","/patient"+id,req,res)
   }
 }
 
