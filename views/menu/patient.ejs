@@ -118,24 +118,24 @@
                 <th scope="row"><%= Number(e.id)+1 %> </th>
                 <td><%= e.data()['lat'] %></td>
                 <td><%= e.data()['lng'] %></td>
-                <td><%= moment(e.timestamp).format('Do MMMM YYYY - HH:mm:ss') %></td>
+                <td><%= moment(e.data()['timestamp']).format('Do MMMM YYYY - HH:mm:ss') %></td>
                 <td><%= e.data()['desc'] %></td>
                 <td>
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= e.patientLID %>" id="editID<%= e.patientLID %>">แก้ไข</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit<%= e.id %>" id="editID<%= e.id %>">แก้ไข</button>
                 <!-- Modal -->
                 <form method="post" action="/editPatient<%= patient.id %>" id="editForm" name="editForm" onsubmit="return editFormValidate()">
-                  <div class="modal fade" id="edit<%= e.patientLID %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= e.patientLID %>Label" aria-hidden="true">
+                  <div class="modal fade" id="edit<%= e.id %>" tabindex="-1" role="dialog" aria-labelledby="edit<%= e.id %>Label" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="edit<%= e.patientLID %> Label">เพิ่มตำแหน่งใหม่</h5>
+                          <h5 class="modal-title" id="edit<%= e.id %> Label">เพิ่มตำแหน่งใหม่</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
                         <div class="modal-body">
-                          <input name="lid" id="lid" value="<%= e.patientLID %>" hidden>
+                          <input name="lid" id="lid" value="<%= e.id %>" hidden>
                           <div class="form-row">
                             <div class="col-md mb-3">
                               <div class="input-group mb-4">
@@ -159,7 +159,7 @@
                               <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="far fa-calendar-alt"></i></span>
                               </div>
-                              <input class="form-control date form_datetime" size="16" type="text" value="<%= moment(e.timestamp).format('DD/MM/YYYY HH:mm:ss') %> %>" name="timestamp" id="timestamp" placeholder="เช่น 2020-05-12 05:30">
+                              <input class="form-control date form_datetime" size="16" type="text" value="<%= moment(e.data()['timestamp']).format('YYYY-MM-DD HH:mm:ss') %> %>" name="timestamp" id="timestamp" placeholder="เช่น 2020-05-12 05:30">
                             </div>
                             <div style="margin-top: -15px; color: red; padding-bottom: 15px;" name="timestampFeedback" id="timestampFeedback"></div>
                             <div class="input-group mb-3">

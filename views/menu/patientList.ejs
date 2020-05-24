@@ -81,7 +81,7 @@
                                                     </div>
                                                     <div class="form-group col-md-4">
                                                       <label for="diseaseNew">หากต้องการเปลี่ยน</label>
-                                                      <select name="diseaseNew" id="diseaseNew" class="selectpicker" value="" data-live-search="true" title="<%= e.diseaseName %>" data-hide-disabled="true" value="<%= e.diseaseID %>">
+                                                      <select name="diseaseNew" id="diseaseNew" class="selectpicker" value="" data-live-search="true" title="<%= e.data()['patientDisease'] %>" data-hide-disabled="true" value="<%= e.data()['patientDisease'] %>">
                                                         <% disease.forEach(function(e) { %>
                                                             <option value="<%= e.data()['diseaseName'] %>"><%= e.data()['diseaseName'] %></option>
                                                           <% }); %>

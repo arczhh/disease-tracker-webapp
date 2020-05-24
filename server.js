@@ -70,18 +70,6 @@ function reponsibleDiseaseByHospitalID(id,callback){
   })
 }
 
-function getReponsibleID(hospitalID,callback){
-  var db = connectAPI('','','contagious_disease')
-  let sql = `SELECT * FROM reponsibledisease WHERE hospitalID = ('${hospitalID}') ORDER BY resDiseaseID DESC LIMIT 1`
-  let query = db.query(sql, (err,results) => {
-      if(err){
-          console.log("Can't fetched reponsible disease.")
-      }else{
-          callback(results);
-      }
-  })
-}
-
 function provinceData(callback){
   firebase.firestore().collection(`province`).get()
   .then(snapshot => {
@@ -380,17 +368,15 @@ function editPatient(id,name,disease,patStat,req,res){
   }
 }
 
-function editPatientLocation(id,lid,lat,lng,desc,timestamp,req,res){
+function editPatientLocation(id,lat,lng,timestamp,desc,req,res){
   if (req.session.loggedin && req.session.role == "Admin") {
-      var db = connectAPI('','','contagious_disease')
-      let sql = `UPDATE patientlocation SET lat = ${lat}, lng = ${lng}, timestamp = '${timestamp}', patientLocDesc = '${desc}' WHERE patientID = ${id} AND patientLID = ${lid}`
-      let query = db.query(sql, (err,result) => {
-          if(err){
-              throw err
-          }else{
-              patientPage(id,"edited","","false","",req,res);
-          }
-      })
+    firebase.firestore().collection(`patient/${id}/location`).doc(`${id}`).update({
+      lat: Number(lat),
+      lng: Number(lng),
+      timestamp: timestamp,
+      desc: desc
+    });
+    patientPage(id,"edited","","false","",req,res);
   }
 }
 
@@ -419,7 +405,7 @@ app.post('/', function(req, res) {
             req.session.email = doc.data()["email"];
             req.session.role = doc.data()["role"];
             console.log("User: "+req.session.email+", logged in time: "+d.toGMTString())
-            if(doc.data()["accountStatus"] == "Deactivated"){
+            if(doc.data()["status"] != "Activated"){
                 res.render('login.ejs',{ alert: "บัญชีของคุณถูกปิดการใช้งาน" });
             }else{
                 res.redirect('/dashboard');
@@ -668,12 +654,12 @@ app.post('/patient:id', function(req, res) {
 
 app.post('/editPatient:id', function(req, res) {
   var id = req.params.id;
-  var lid = req.body.lid;
   var lat = req.body.lat;
   var lng = req.body.lng;
   var desc = req.body.detail;
   var timestamp = req.body.timestamp;
-  editPatientLocation(id,lid,lat,lng,desc,timestamp,req,res)
+  console.log(timestamp)
+  editPatientLocation(id,lat,lng,timestamp,desc,req,res)
 });
 
 // User
