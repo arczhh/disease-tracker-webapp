@@ -16,6 +16,7 @@ firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
   databaseURL: "https://disease-tracker-91b76.firebaseio.com/"
 });
+app.set('view engine','ejs')
 app.use(express.static('views'));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
