@@ -31,6 +31,8 @@ app.use((req, res, next)=>{
     next();
 });
 
+// Extention Variables
+let path = undefined;
 
 /*
         Fetch Function
@@ -574,17 +576,18 @@ app.get('/patient:id', function(req, res) {
 });
 
 app.get('/patlocadd', (req,res) => {
-  fs.readFile('data.csv', async (err, data) => {
+  console.log(global.path)
+  fs.readFile(global.path, async (err, data) => {
     if (err) {
       console.error(err)
       return
     }
     var dat = await neatCsv(data, { headers: false });
-    var patientID = dat[0][0]
+    var patientID = `${parseInt(dat[0][0])}`;
     firebase.firestore().collection(`patient/${patientID}/location`).get()
       .then(snapshot => {
         var id = snapshot.size
-        dat.forEach(function (value, i) {
+        dat.forEach(function (value) {
           firebase.firestore().collection(`patient/${patientID}/location`).doc(`${id}`).set({
             lat: Number(value['2']), 
             lng: Number(value['3']),
@@ -602,11 +605,11 @@ app.post('/patientloc:id', function(req, res) {
   var id = req.params.id
   var form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
-      var oldpath = files.filetoupload.path;
-      var newpath = 'D:/Codes/Node.js/disease-tracker/data.csv';
+      global.path = files.filetoupload.path;
+      //global.path = 'C:\\Users\\arczhh\\AppData\\Local\\Temp\\data.csv';
       var name = files.filetoupload.name.split(".")
-      fs.copyFileSync(oldpath, newpath);
-      fs.readFile('data.csv', async (err, data) => {
+      //fs.copyFileSync(global.oldpath, global.path);
+      fs.readFile(global.path, async (err, data) => {
       if (err) {
           console.error(err)
           return
@@ -615,7 +618,7 @@ app.post('/patientloc:id', function(req, res) {
       var isIDEquals
       var alert = ""
       for(var i=0; i<dat.length; i++){
-          isIDEquals = dat[i]["0"] == id
+          isIDEquals = parseInt(`${dat[i][0]}`) == parseInt(`${id}`)
           if(!isIDEquals) break;
       }
       if(!isIDEquals){
