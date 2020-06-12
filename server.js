@@ -108,7 +108,7 @@ function patientDataByID(id,callback){
 }
 
 function patientLocationDataByID(id,callback){
-  firebase.firestore().collection(`patient/${id}/location`).get()
+  firebase.firestore().collection(`patient/${id}/location`).orderBy("timestamp").get()
   .then(function(querySnapshot) {
     return callback(querySnapshot);
   });
@@ -246,7 +246,7 @@ function addPatStat(name,req,res){
 function addPatient(name,disease,patStat,username,req,res){
   firebase.firestore().collection("patient").get()
   .then(snapshot => {
-    firebase.firestore().collection("patient").set({
+    firebase.firestore().collection("patient").add({
       username: username,
       patientName: name,
       patientDisease: disease,
@@ -260,7 +260,7 @@ function addPatientLocation(id,lat,lng,desc,timestamp,req,res){
   if (req.session.loggedin && req.session.role == "Admin") {
     firebase.firestore().collection(`patient/${id}/location`).get()
     .then(snapshot => {
-      firebase.firestore().collection(`patient/${id}/location`).set({
+      firebase.firestore().collection(`patient/${id}/location`).add({
         lat: Number(lat), 
         lng: Number(lng),
         timestamp: timestamp,
