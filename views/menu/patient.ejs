@@ -113,9 +113,9 @@
               </tr>
           </tfoot>
           <tbody>
-            <% patLoc.forEach(function(e) { %>
+            <% var i=0; patLoc.forEach(function(e) { i++; %>
             <tr>
-                <th scope="row"><%= Number(e.id)+1 %> </th>
+                <th scope="row"><%= i %> </th>
                 <td><%= e.data()['lat'] %></td>
                 <td><%= e.data()['lng'] %></td>
                 <td><%= moment(e.data()['timestamp']).format('Do MMMM YYYY - HH:mm:ss') %></td>

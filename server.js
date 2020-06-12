@@ -246,7 +246,7 @@ function addPatStat(name,req,res){
 function addPatient(name,disease,patStat,username,req,res){
   firebase.firestore().collection("patient").get()
   .then(snapshot => {
-    firebase.firestore().collection("patient").doc(`${snapshot.size}`).set({
+    firebase.firestore().collection("patient").set({
       username: username,
       patientName: name,
       patientDisease: disease,
@@ -260,7 +260,7 @@ function addPatientLocation(id,lat,lng,desc,timestamp,req,res){
   if (req.session.loggedin && req.session.role == "Admin") {
     firebase.firestore().collection(`patient/${id}/location`).get()
     .then(snapshot => {
-      firebase.firestore().collection(`patient/${id}/location`).doc(`${snapshot.size}`).set({
+      firebase.firestore().collection(`patient/${id}/location`).set({
         lat: Number(lat), 
         lng: Number(lng),
         timestamp: timestamp,

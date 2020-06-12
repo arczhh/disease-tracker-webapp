@@ -36,9 +36,9 @@
                         </tr>
                     </tfoot>
                     <tbody>
-                        <% patient.forEach(function(e) { %>
+                        <% var i=0; patient.forEach(function(e) { i++; %>
                             <tr>
-                              <th scope="row"><%= Number(e.id)+1 %> </th>
+                              <th scope="row"><%= i %> </th>
                               <td><%= e.data()['username'] %></td>
                               <td><%= e.data()['patientName'] %></td>
                               <td><%= e.data()['patientDisease'] %></td>
