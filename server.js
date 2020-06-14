@@ -256,7 +256,8 @@ function addPatient(name,disease,patStat,username,req,res){
   })
 }
 
-function addPatientLocation(id,lat,lng,desc,timestamp,req,res){
+function addPatientLocation(id,lat,lng,desc,timestamp,req,res){ 
+  var asiaTime = new Date(`${timestamp.split(" ")[0]}T${timestamp.split(" ")[1]}`).toLocaleString("en-US", {timeZone: "Asia/Bangkok"});
   if (req.session.loggedin && req.session.role == "Admin") {
     firebase.firestore().collection(`patient/${id}/location`).get()
     .then(snapshot => {
@@ -264,6 +265,7 @@ function addPatientLocation(id,lat,lng,desc,timestamp,req,res){
         lat: Number(lat), 
         lng: Number(lng),
         timestamp: timestamp,
+        unixTimestamp: new Date(asiaTime).getTime(),
         desc: desc
       });
       alert("success","เพิ่มตำแหน่งผู้ป่วยสำเร็จ","/patient"+id,req,res)
@@ -354,11 +356,13 @@ function editPatient(id,name,disease,patStat,req,res){
 }
 
 function editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res){
+  var asiaTime = new Date(`${timestamp.split(" ")[0]}T${timestamp.split(" ")[1]}`).toLocaleString("en-US", {timeZone: "Asia/Bangkok"});
   if (req.session.loggedin && req.session.role == "Admin") {
     firebase.firestore().collection(`patient/${id}/location`).doc(`${lid}`).update({
       lat: Number(lat),
       lng: Number(lng),
       timestamp: timestamp,
+      unixTimestamp: new Date(asiaTime).getTime(),
       desc: desc
     });
     alert("success","บันทึกการแก้ไขการเปลี่ยนแปลงตำแหน่งของผู้ป่วยสำเร็จ","/patient"+id,req,res)
