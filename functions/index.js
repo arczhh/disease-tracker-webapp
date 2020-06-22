@@ -1,29 +1,55 @@
+const functions = require('firebase-functions');
+
+// // Create and Deploy Your First Cloud Functions
+// // https://firebase.google.com/docs/functions/write-firebase-functions
+//
+// exports.helloWorld = functions.https.onRequest((request, response) => {
+//  response.send("Hello from Firebase!");
+// });
+
 const express = require('express');
 const firebase = require("firebase-admin");
-const bcrypt = require('bcryptjs');
-const port = process.env.PORT || 3000;
+const bcrypt = require('bcrypt');
+const port = process.env.PORT || 5001;
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const formidable = require('formidable');
 const neatCsv = require('neat-csv');
 const fs = require('fs-extra');
-const crypto = require('crypto')
+var cookieParser = require('cookie-parser');
 const d = new Date();
 const app = express();
+const FirestoreStore = require('firestore-store')(session);
+var MemoryStore = session.MemoryStore;
+
 const serviceAccount = require("./disease-tracker-91b76-firebase-adminsdk-mfz8y-f52e76a570.json");
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
   databaseURL: "https://disease-tracker-91b76.firebaseio.com/"
 });
+
 app.set('view engine','ejs')
 app.use(express.static('views'));
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
-app.use(session({
+/*app.use(session({
 	secret: 'secret',
 	resave: true,
 	saveUninitialized: true
+}));*/
+app.use(session({
+    store: new FirestoreStore({
+         database: firebase.firestore()
+    }),
+    name: '__session',
+    secret: 'My secret',
+    resave: true,
+    saveUninitialized: true,
+    cookie: {maxAge : 60000,
+             secure: false,
+             httpOnly: false }
 }));
 app.use((req, res, next)=>{
     moment.locale('th')
@@ -371,12 +397,12 @@ function editPatientLocation(id,lid,lat,lng,timestamp,desc,req,res){
 
 // Login
 app.get('/', function(req, res) {
-  if (req.session.loggedin) {
-      res.redirect('/dashboard');
-  } else {
-    res.render('login.ejs',{ alert: ""});
-  }
-});
+    if (req.session.loggedin) {
+        res.redirect('/dashboard');
+    } else {
+      res.render('login.ejs',{ alert: ""});
+    }
+  });
 
 app.post('/', function(req, res) {
   var email = req.body.email;
@@ -679,6 +705,8 @@ app.use(function (req, res, next) {
 });
 
 // App run server
-app.listen(port, function() {
+/*app.listen(port, function() {
     console.log('Server is running on port '+port)
-})
+})*/
+
+exports.app = functions.https.onRequest(app);
