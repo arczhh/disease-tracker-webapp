@@ -47,7 +47,7 @@ app.use(session({
     secret: 'My secret',
     resave: true,
     saveUninitialized: true,
-    cookie: {maxAge : 60000,
+    cookie: {maxAge : 24 * 60 * 60 * 1000,
              secure: false,
              httpOnly: false }
 }));
@@ -125,6 +125,13 @@ function patientData(callback){
     return callback(querySnapshot);
   })
 }
+
+function patientDataByDisease(disease, callback){
+    firebase.firestore().collection("patient").where("patientDisease","==",disease).get()
+    .then(function(querySnapshot) {
+      return callback(querySnapshot);
+    })
+  }
 
 function patientDataByID(id,callback){
   firebase.firestore().collection("patient").doc(`${id}`).get()
@@ -698,6 +705,25 @@ app.get('/logout',(req,res) => {
       res.redirect('/');
   });
 });
+
+app.get('/api', (req,res) => {
+    res.render("api/api.ejs");
+  });
+
+  app.get('/api/patient/', (req,res) => {
+    patientDataByDisease("โควิด-19", function(data){           
+        res.render("api/patient.ejs",{ 
+          data: data})
+      });
+ });
+
+app.get('/api/patient/:id', (req,res) => {
+    patientLocationDataByID(req.params.id, function(data){           
+        res.render("api/patientloc.ejs",{
+            id: req.params.id,
+            data: data })
+      });
+ });
 
 // route for handling 404 requests(unavailable routes)
 app.use(function (req, res, next) {

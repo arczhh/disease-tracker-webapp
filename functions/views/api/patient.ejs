@@ -1,0 +1,3 @@
+<% var i=0; data.forEach(function(e) { i++ %>
+    <a href="/api/patient/<%= e.id %>"><%= e.id+', '+e.data()['username']+', '+e.data()['patientName']+', '+e.data()['patientDisease']+', '+e.data()['patientStatus']%></a><br>
+<% }); %>
